@@ -1,0 +1,36 @@
+Humbaba throughput — 2026-07-27
+CPython 3.12.3, 1 CPU
+
+1. The host ceiling (provider latency removed)
+----------------------------------------------
+  Python closure backend: 176,884 ops/s  (5.65 µs/op)
+  This is a hard ceiling. Concurrency does not raise it — the
+  overhead is CPU work, and CPython serialises it.
+
+  Compiled host, estimated: 1,973,721 ops/s (0.51 µs/op)
+  Scaled by the measured 11.2x dispatch ratio. An
+  estimate, not a measurement — the C VM has no gen<T>.
+
+2. When does that ceiling actually bind?
+----------------------------------------
+  To saturate the host you must have enough calls in flight to
+  keep it busy: concurrency = throughput x latency.
+
+      provider latency   concurrency to saturate Python
+  frontier model 800 ms                141,507 in flight
+    small model 150 ms                 26,533 in flight
+     local model 15 ms                  2,653 in flight
+  cached lookup 200 µs                     35 in flight
+       in-memory 20 µs                      4 in flight
+
+  Python asyncio tops out around 500,000 concurrent tasks
+  (measured: 0.71 KB each). Anything needing more than that is
+  where a compiled host stops being optional.
+
+3. Verdict
+----------
+    frontier model @  800.00 ms → Humbaba is   0.00% of each call   host irrelevant
+       small model @  150.00 ms → Humbaba is   0.00% of each call   host irrelevant
+       local model @   15.00 ms → Humbaba is   0.04% of each call   host irrelevant
+     cached lookup @    0.20 ms → Humbaba is   2.83% of each call   host noticeable
+

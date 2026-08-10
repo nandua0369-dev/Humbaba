@@ -1,0 +1,45 @@
+Humbaba vs Python — 2026-07-26
+CPython 3.12.3
+
+A. Raw execution speed — Humbaba loses, and should
+----------------------------------------------
+  20000 iterations of an identical function
+  Humbaba (compiled closures) :     63.0 ms  ( 3.15 µs/iter)
+  CPython                 :      8.8 ms  ( 0.44 µs/iter)
+  → CPython is 7.1x faster. An interpreter written in Python
+    cannot beat Python; every Humbaba op costs ≥1 Python op.
+
+B. The actual workload — 24 documents, 2 chained calls each
+-----------------------------------------------------------
+  Python, written the obvious way :  12.01 s
+  Python, hand-tuned with a pool  :   1.00 s
+  Humbaba                             :   1.00 s
+
+  → Humbaba is  12.0x faster than the obvious Python
+  → Humbaba is   1.0x the hand-tuned Python (parity is the goal)
+
+  Humbaba is not executing anything faster. It is doing the concurrent
+  thing by default, where Python does the sequential thing by default.
+  The hand-tuned version closes the gap — and that is the point:
+  you had to write it, and remember to bound it, and get it right.
+
+C. What the equivalent programs cost to write
+---------------------------------------------
+  Humbaba, complete:
+      let out = parallel for d in docs {
+        gen<Verdict> from classify(vendor: gen<Invoice> from extract(document: d).vendor)
+      } limit 16
+
+  The hand-tuned Python needs, separately and by hand:
+      · a ThreadPoolExecutor and a chosen width
+      · ordered collection of results
+      · cancellation on failure, or orphaned work
+      · retry logic, and the hard/soft distinction
+      · a cost counter, checked somewhere
+      · JSON parsing and shape validation
+      · delimiting untrusted text in the prompt
+      · a cache, if you want replay
+
+  Every one of those is a place to be wrong. Humbaba's speed advantage
+  over ordinary Python is really a default-correctness advantage.
+

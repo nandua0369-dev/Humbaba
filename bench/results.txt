@@ -1,0 +1,84 @@
+Humbaba v0.1 benchmarks — 2026-07-26
+CPython 3.12.3, 1 CPUs
+
+1. Front end
+------------
+  lex         817 tokens in    1.10 ms (0.7M tokens/s)
+  parse       112 lines in    1.51 ms
+  → a 10,000-line program parses in ~135 ms
+
+2. Interpreter dispatch (no model involved)
+-------------------------------------------
+20000
+20000
+20000
+20000
+20000
+20000
+20000
+20000
+20000
+20000
+  20000 iterations, ~14 AST nodes each
+   tree:  54.05 µs/iter  ≈    18,500 fn-calls/s  ≈   0.3M AST nodes/s
+   fast:   3.12 µs/iter  ≈   320,753 fn-calls/s  ≈   4.5M AST nodes/s
+  → closure compilation is 17.3x faster than tree-walking
+
+3. Runtime overhead per gen<T> call
+-----------------------------------
+2000
+2000
+2000
+2000
+2000
+2000
+2000
+  2000 replayed gens (fencing, hashing, coercion, budget, policy)
+   tree:  11.2 µs per gen
+   fast:   7.6 µs per gen
+  → against a fast model at 300 ms: Humbaba is 0.0025% of wall time
+  → against a typical at 800 ms: Humbaba is 0.0009% of wall time
+  → against a long agent step at 8000 ms: Humbaba is 0.0001% of wall time
+
+4. Cost of the parallel machinery itself
+----------------------------------------
+5000
+5000
+5000
+5000
+5000
+5000
+  sequential 5000 trivial iterations:     0.8 ms
+  parallel   5000 trivial iterations:    45.9 ms
+  → dispatching a task costs ~9 µs (vs ~0.3 µs for a goroutine)
+
+5. Concurrency scaling (I/O-bound, 250 ms simulated latency)
+------------------------------------------------------------
+128
+  limit   16:   2.01 s  (ideal 2.00 s, efficiency  99.6%)
+128
+  limit   64:   0.51 s  (ideal 0.50 s, efficiency  97.1%)
+128
+  limit  128:   0.27 s  (ideal 0.25 s, efficiency  93.7%)
+  serial would be 32.0 s
+
+6. Concurrency scaling (CPU-bound — the GIL test)
+-------------------------------------------------
+512
+  limit  1:     8.7 ms
+512
+  limit  8:    13.8 ms
+  NOTE: this machine reports 1 CPU, so this measures nothing about
+  the GIL. CPython threads serialise on CPU-bound work regardless;
+  treat that as a known property, not as something measured here.
+
+7. In-flight task capacity (threads)
+------------------------------------
+  baseline: RSS 32 MB, virtual 589 MB
+     100 live threads:     59.0 ms, RSS +   1.1 MB, virtual +     762 MB (7802 KB/thread)
+    1000 live threads:    149.0 ms, RSS +   9.4 MB, virtual +    6231 MB (6381 KB/thread)
+    5000 live threads:    516.5 ms, RSS +  29.9 MB, virtual +   15453 MB (3165 KB/thread)
+   10000 live threads:   1120.5 ms, RSS +  66.3 MB, virtual +   25962 MB (2658 KB/thread)
+  goroutines start at ~2 KB; OS threads at ~8 MB of reserved stack.
+  This is the hard ceiling on the blueprint's '100,000 in flight'.
+

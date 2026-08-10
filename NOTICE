@@ -1,0 +1,48 @@
+Humbaba
+Copyright (C) 2026 Nandu Aravindakshan
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+DUAL LICENSING
+
+Humbaba is available under two licences:
+
+  1. The GNU Affero General Public License v3.0 (AGPL-3.0), for open-source
+     use. Under this licence, if you run a modified version of Humbaba to
+     provide a network service, you must make your complete corresponding
+     source code available to the users of that service.
+
+  2. A commercial licence, for organisations that cannot accept the AGPL's
+     source-disclosure obligations. See COMMERCIAL.md.
+
+You may choose either. If you have not obtained a commercial licence, the
+AGPL applies.
+
+---
+
+TRADEMARK
+
+"Humbaba" is a trademark of Nandu Aravindakshan. Neither licence grants
+permission to use the name to endorse or promote derived products.
+
+---
+
+CONTRIBUTIONS
+
+Dual licensing requires that the copyright holder owns all rights in the work.
+Contributions can therefore only be accepted under a Contributor Licence
+Agreement assigning copyright, or granting a licence broad enough to permit
+relicensing. See CONTRIBUTING.md before submitting a patch.

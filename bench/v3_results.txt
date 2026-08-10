@@ -1,0 +1,45 @@
+Humbaba v0.3 benchmarks — 2026-08-08
+CPython 3.12.3, 1 CPU
+
+1. Static checking — what does `humbaba check` cost?
+------------------------------------------------
+  parse           0.34 ms
+  check           0.04 ms   (11% of parse)
+  compile         0.04 ms
+  total front     0.41 ms
+
+  Checking runs once per program, before anything executes. Against
+  a single 800 ms model call it is already invisible; against the
+  money a wrong prompt argument would waste, it is free.
+
+2. Did the new features slow the hot path?
+------------------------------------------
+  for + fn call              3.29 µs/iter  ≈   303,854 iter/s
+  while + index + assign     4.04 µs/iter  ≈   247,726 iter/s
+
+  The while/index/assign form is 1.23x the cost of the
+  for-loop form — extra work per iteration (bounds check, two
+  assignments), not a regression in the shared machinery.
+
+3. Per-gen overhead — taint and reservation added, did it cost?
+---------------------------------------------------------------
+  2000 replayed gens:  7.63 µs each
+  v0.2 measured 7.6 µs — no regression
+  → against a typical model at 800 ms: 0.0010% of wall time
+  → against a small model at 150 ms: 0.0051% of wall time
+
+4. Schedulers — threads vs asyncio
+----------------------------------
+   2000 tasks, limit 1000:  threads   118.7 ms   asyncio    77.5 ms   (1.5x)
+   5000 tasks, limit 2000:  threads   362.9 ms   asyncio   268.3 ms   (1.4x)
+
+5. Durability — what does journaling cost per step?
+---------------------------------------------------
+  50 plain iterations          21.0 µs
+  3 journaled steps            0.98 ms
+  → ~0.33 ms per step, dominated by fsync
+
+  fsync is the point: a journal that is not durable is not a
+  journal. Against an 800 ms model call it is ~0.2% overhead, and
+  it buys not repeating that call after a crash.
+
