@@ -380,3 +380,7 @@ established prior art — capability systems (Dennis & Van Horn 1966, Lampson
 to language models, notably CaMeL (Google DeepMind, 2025), LBAC, and Progent.
 Humbaba's contribution is implementation completeness, not novel technique.
 See `docs/PROVENANCE.md`.
+
+---
+
+Copyright © 2026 Nandu Aravindakshan. Licensed under AGPL-3.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Commercial licensing: [COMMERCIAL.md](COMMERCIAL.md).
